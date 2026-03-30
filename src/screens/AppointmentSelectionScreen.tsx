@@ -1,11 +1,18 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../theme';
+import { useBookingStore } from '../store';
 
 export function AppointmentSelectionScreen() {
+  const appointment = useBookingStore((s) => s.appointment);
+  const setAppointment = useBookingStore((s) => s.setAppointment);
+  const canConfirm = useBookingStore((s) => s.canConfirm);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Appointment Selection</Text>
-      <Text style={styles.subtitle}>Pick a date and time</Text>
+      <Text style={styles.subtitle}>
+        {appointment ? `Selected: ${appointment}` : 'No time selected'}
+      </Text>
     </View>
   );
 }

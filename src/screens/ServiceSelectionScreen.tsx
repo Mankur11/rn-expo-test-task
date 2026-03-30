@@ -1,9 +1,19 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../theme';
 import { useUniverse } from '../api';
+import { useBookingStore } from '../store';
+import type { RootStackParamList } from '../navigation/RootNavigator';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ServiceSelection'>;
 
 export function ServiceSelectionScreen() {
+  const navigation = useNavigation<NavigationProp>();
   const { data: universe, isLoading, error } = useUniverse();
+  const totalPrice = useBookingStore((s) => s.totalPrice);
+  const totalDuration = useBookingStore((s) => s.totalDuration);
+  const canProceed = useBookingStore((s) => s.canProceedToAddress);
 
   if (isLoading) {
     return (
@@ -26,6 +36,9 @@ export function ServiceSelectionScreen() {
       <Text style={styles.title}>{universe?.title}</Text>
       <Text style={styles.subtitle}>
         {universe?.categories.length} categories loaded
+      </Text>
+      <Text style={styles.subtitle}>
+        Basket: {totalPrice()}ct / {totalDuration()}min
       </Text>
     </View>
   );
@@ -53,6 +66,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: theme.fontSize.md,
     color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
   },
   errorText: {
     fontSize: theme.fontSize.md,

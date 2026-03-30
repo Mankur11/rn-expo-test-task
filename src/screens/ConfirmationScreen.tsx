@@ -1,7 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../theme';
+import { useBookingStore } from '../store';
+import type { RootStackParamList } from '../navigation/RootNavigator';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Confirmation'>;
 
 export function ConfirmationScreen() {
+  const navigation = useNavigation<NavigationProp>();
+  const reset = useBookingStore((s) => s.reset);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Booking Confirmed</Text>
