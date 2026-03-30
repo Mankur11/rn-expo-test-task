@@ -23,6 +23,10 @@ export function ServiceSelectionScreen() {
   const totalDuration = useBookingStore((s) => s.totalDuration);
   const canProceed = useBookingStore((s) => s.canProceedToAddress);
 
+  const price = totalPrice();
+  const duration = totalDuration();
+  const canNext = canProceed();
+
   if (isLoading) {
     return (
       <ScreenLayout style={styles.centered}>
@@ -61,9 +65,9 @@ export function ServiceSelectionScreen() {
     <ScreenLayout
       footer={
         <BasketSummary
-          totalPrice={totalPrice()}
-          totalDuration={totalDuration()}
-          canProceed={canProceed()}
+          totalPrice={price}
+          totalDuration={duration}
+          canProceed={canNext}
           onNext={() => navigation.navigate('AddressSelection')}
         />
       }

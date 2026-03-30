@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePickerNative, {
   DateTimePickerEvent,
@@ -24,8 +24,13 @@ interface DateTimePickerProps {
 }
 
 export function DateTimePicker({ value, onChange, minimumDate }: DateTimePickerProps) {
+  const pickerValue = useMemo(() => value ?? new Date(), [value]);
   const [pickerStep, setPickerStep] = useState<PickerStep>(PICKER_STEP.CLOSED);
-  const [tempDate, setTempDate] = useState<Date>(value ?? new Date());
+  const [tempDate, setTempDate] = useState<Date>(pickerValue);
+  const buttonLabel = useMemo(
+    () => (value ? format(value, 'dd/MM/yyyy HH:mm') : messages.selectDatetime),
+    [value],
+  );
 
   const handleDateChange = (_event: DateTimePickerEvent, date?: Date) => {
     if (!date) {
@@ -51,7 +56,7 @@ export function DateTimePicker({ value, onChange, minimumDate }: DateTimePickerP
     return (
       <View style={styles.container}>
         <DateTimePickerNative
-          value={value ?? new Date()}
+          value={pickerValue}
           mode="datetime"
           display="spinner"
           onChange={handleDateChange}
@@ -65,9 +70,7 @@ export function DateTimePicker({ value, onChange, minimumDate }: DateTimePickerP
   return (
     <View style={styles.container}>
       <Pressable style={styles.pickerButton} onPress={() => setPickerStep(PICKER_STEP.DATE)}>
-        <Text style={styles.pickerButtonText}>
-          {value ? format(value, 'dd/MM/yyyy HH:mm') : messages.selectDatetime}
-        </Text>
+        <Text style={styles.pickerButtonText}>{buttonLabel}</Text>
       </Pressable>
 
       {pickerStep === PICKER_STEP.DATE && (

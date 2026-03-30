@@ -1,9 +1,17 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { useMemo } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { format } from 'date-fns';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useBookingStore } from '../store';
-import { ScreenLayout } from '../components';
+import {
+  ScreenLayout,
+  ConfirmationHeader,
+  ServiceLineItem,
+  BookingDetailRow,
+} from '../components';
+import { formatPrice, formatDuration, groupBasketItems } from '../utils';
 import { theme } from '../theme';
 import { messages } from '../constants/messages';
 
@@ -11,7 +19,21 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Confirmatio
 
 export function ConfirmationScreen() {
   const navigation = useNavigation<NavigationProp>();
+
+  const basket = useBookingStore((s) => s.basket);
+  const address = useBookingStore((s) => s.address);
+  const appointment = useBookingStore((s) => s.appointment);
+  const totalPrice = useBookingStore((s) => s.totalPrice);
+  const totalDuration = useBookingStore((s) => s.totalDuration);
   const reset = useBookingStore((s) => s.reset);
+
+  const groupedItems = useMemo(() => groupBasketItems(basket), [basket]);
+  const formattedAppointment = useMemo(
+    () => (appointment ? format(new Date(appointment), 'dd/MM/yyyy HH:mm') : ''),
+    [appointment],
+  );
+  const formattedDuration = formatDuration(totalDuration());
+  const formattedPrice = formatPrice(totalPrice());
 
   const handleNewBooking = () => {
     reset();
@@ -21,38 +43,97 @@ export function ConfirmationScreen() {
   };
 
   return (
-    <ScreenLayout style={styles.centered}>
-      <Text style={styles.title}>{messages.bookingConfirmedTitle}</Text>
-      <Text style={styles.subtitle}>{messages.bookingConfirmedMessage}</Text>
-      <Pressable style={styles.button} onPress={handleNewBooking}>
-        <Text style={styles.buttonText}>{messages.newBooking}</Text>
-      </Pressable>
+    <ScreenLayout edges={['top', 'bottom']}>
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ConfirmationHeader />
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{messages.summaryServices}</Text>
+          {groupedItems.map((item) => (
+            <ServiceLineItem key={item.prestation.reference} item={item} />
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{messages.summaryDetails}</Text>
+          <BookingDetailRow label={messages.deliveryAddress} value={address} />
+          {formattedAppointment !== '' && (
+            <BookingDetailRow
+              label={messages.summaryAppointment}
+              value={formattedAppointment}
+            />
+          )}
+        </View>
+
+        <View style={styles.totalsSection}>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>{messages.summaryDuration}</Text>
+            <Text style={styles.totalValue}>{formattedDuration}</Text>
+          </View>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>{messages.summaryTotal}</Text>
+            <Text style={styles.totalPrice}>{formattedPrice}</Text>
+          </View>
+        </View>
+
+        <Pressable style={styles.button} onPress={handleNewBooking}>
+          <Text style={styles.buttonText}>{messages.newBooking}</Text>
+        </Pressable>
+      </ScrollView>
     </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  scroll: {
+    flex: 1,
   },
-  title: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.success,
+  section: {
+    marginBottom: theme.spacing.lg,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+  },
+  sectionTitle: {
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.text,
     marginBottom: theme.spacing.sm,
   },
-  subtitle: {
+  totalsSection: {
+    marginBottom: theme.spacing.lg,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xs,
+  },
+  totalLabel: {
     fontSize: theme.fontSize.md,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: theme.spacing.xl,
+    color: theme.colors.text,
+  },
+  totalValue: {
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.text,
+  },
+  totalPrice: {
+    fontSize: theme.fontSize.lg,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.primary,
   },
   button: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
+    alignItems: 'center',
+    paddingVertical: theme.spacing.md,
     backgroundColor: theme.colors.primary,
     borderRadius: theme.borderRadius.md,
+    marginBottom: theme.spacing.lg,
   },
   buttonText: {
     fontSize: theme.fontSize.md,

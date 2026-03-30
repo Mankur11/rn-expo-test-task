@@ -18,11 +18,14 @@ export function BasketSummary({
   onNext,
   buttonLabel = messages.next,
 }: BasketSummaryProps) {
+  const formattedPrice = formatPrice(totalPrice);
+  const formattedDuration = formatDuration(totalDuration);
+
   return (
     <View style={styles.container}>
       <View style={styles.totals}>
-        <Text style={styles.totalText}>{formatPrice(totalPrice)}</Text>
-        <Text style={styles.durationText}>{formatDuration(totalDuration)}</Text>
+        <Text style={styles.totalText}>{formattedPrice}</Text>
+        <Text style={styles.durationText}>{formattedDuration}</Text>
       </View>
       <Pressable
         style={[styles.button, !canProceed && styles.buttonDisabled]}

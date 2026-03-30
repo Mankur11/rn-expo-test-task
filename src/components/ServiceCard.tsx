@@ -13,12 +13,15 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, quantity, onAdd, onRemove }: ServiceCardProps) {
+  const formattedPrice = formatPrice(service.price);
+  const formattedDuration = formatDuration(service.duration);
+
   return (
     <View style={styles.card}>
       <View style={styles.info}>
         <Text style={styles.title}>{service.title}</Text>
         <Text style={styles.details}>
-          {formatPrice(service.price)} · {formatDuration(service.duration)}
+          {formattedPrice} · {formattedDuration}
         </Text>
       </View>
       <View style={styles.controls}>

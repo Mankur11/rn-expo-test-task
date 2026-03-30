@@ -1,17 +1,18 @@
 import { ReactNode } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../theme';
 
 interface ScreenLayoutProps {
   children: ReactNode;
   footer?: ReactNode;
   style?: ViewStyle;
+  edges?: Edge[];
 }
 
-export function ScreenLayout({ children, footer, style }: ScreenLayoutProps) {
+export function ScreenLayout({ children, footer, style, edges = ['bottom'] }: ScreenLayoutProps) {
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={edges}>
       <View style={[styles.content, style]}>{children}</View>
       {footer && <View style={styles.footer}>{footer}</View>}
     </SafeAreaView>

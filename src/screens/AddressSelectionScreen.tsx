@@ -19,6 +19,9 @@ export function AddressSelectionScreen() {
   const totalDuration = useBookingStore((s) => s.totalDuration);
   const canProceed = useBookingStore((s) => s.canProceedToAppointment);
 
+  const price = totalPrice();
+  const duration = totalDuration();
+  const canNext = canProceed();
   const trimmed = address.trim();
   const showError = address.length > 0 && trimmed.length === 0;
 
@@ -26,9 +29,9 @@ export function AddressSelectionScreen() {
     <ScreenLayout
       footer={
         <BasketSummary
-          totalPrice={totalPrice()}
-          totalDuration={totalDuration()}
-          canProceed={canProceed()}
+          totalPrice={price}
+          totalDuration={duration}
+          canProceed={canNext}
           onNext={() => navigation.navigate('AppointmentSelection')}
         />
       }
@@ -49,7 +52,7 @@ export function AddressSelectionScreen() {
             autoFocus
             returnKeyType="done"
             onSubmitEditing={() => {
-              if (canProceed()) navigation.navigate('AppointmentSelection');
+              if (canNext) navigation.navigate('AppointmentSelection');
             }}
           />
           {showError && (
