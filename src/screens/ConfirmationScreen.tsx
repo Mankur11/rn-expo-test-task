@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { theme } from '../theme';
-import { useBookingStore } from '../store';
 import type { RootStackParamList } from '../navigation/RootNavigator';
+import { useBookingStore } from '../store';
+import { ScreenLayout } from '../components';
+import { theme } from '../theme';
+import { messages } from '../constants/messages';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Confirmation'>;
 
@@ -11,29 +13,50 @@ export function ConfirmationScreen() {
   const navigation = useNavigation<NavigationProp>();
   const reset = useBookingStore((s) => s.reset);
 
+  const handleNewBooking = () => {
+    reset();
+    navigation.dispatch(
+      CommonActions.reset({ index: 0, routes: [{ name: 'ServiceSelection' }] }),
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Booking Confirmed</Text>
-      <Text style={styles.subtitle}>Your appointment is set</Text>
-    </View>
+    <ScreenLayout style={styles.centered}>
+      <Text style={styles.title}>{messages.bookingConfirmedTitle}</Text>
+      <Text style={styles.subtitle}>{messages.bookingConfirmedMessage}</Text>
+      <Pressable style={styles.button} onPress={handleNewBooking}>
+        <Text style={styles.buttonText}>{messages.newBooking}</Text>
+      </Pressable>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  centered: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
   },
   title: {
     fontSize: theme.fontSize.xl,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.success,
     marginBottom: theme.spacing.sm,
-    color: theme.colors.text,
   },
   subtitle: {
     fontSize: theme.fontSize.md,
     color: theme.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: theme.spacing.xl,
+  },
+  button: {
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+  },
+  buttonText: {
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.background,
   },
 });

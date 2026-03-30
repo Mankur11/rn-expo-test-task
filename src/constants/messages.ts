@@ -1,0 +1,18 @@
+export const messages = {
+  loadingServices: 'Loading services...',
+  errorLoadingServices: 'Failed to load services',
+  deliveryAddress: 'Delivery address',
+  addressPlaceholder: 'Enter your address',
+  chooseDatetime: 'Choose a date and time',
+  selectDatetime: 'Select date and time',
+  invalidAppointmentTitle: 'Invalid time',
+  invalidAppointment: 'Please select a time between 7:00 and 22:00.',
+  bookingErrorTitle: 'Error',
+  bookingError: 'Failed to create booking. Please try again.',
+  bookingConfirmedTitle: 'Booking Confirmed!',
+  bookingConfirmedMessage: 'Your appointment has been booked successfully.',
+  newBooking: 'New Booking',
+  next: 'Next',
+  confirm: 'Confirm',
+  booking: 'Booking...',
+};
