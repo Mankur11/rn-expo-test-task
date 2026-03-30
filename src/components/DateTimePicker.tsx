@@ -7,6 +7,16 @@ import { format } from 'date-fns';
 import { theme } from '../theme';
 import { messages } from '../constants/messages';
 
+const isIOS = Platform.OS === 'ios';
+
+const PICKER_STEP = {
+  CLOSED: 'closed',
+  DATE: 'date',
+  TIME: 'time',
+} as const;
+
+type PickerStep = (typeof PICKER_STEP)[keyof typeof PICKER_STEP];
+
 interface DateTimePickerProps {
   value: Date | null;
   onChange: (date: Date) => void;
@@ -14,30 +24,30 @@ interface DateTimePickerProps {
 }
 
 export function DateTimePicker({ value, onChange, minimumDate }: DateTimePickerProps) {
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [pickerStep, setPickerStep] = useState<PickerStep>(PICKER_STEP.CLOSED);
   const [tempDate, setTempDate] = useState<Date>(value ?? new Date());
 
   const handleDateChange = (_event: DateTimePickerEvent, date?: Date) => {
-    if (Platform.OS === 'android') setShowDatePicker(false);
-    if (date) {
-      setTempDate(date);
-      if (Platform.OS === 'android') {
-        setShowTimePicker(true);
-      } else {
-        onChange(date);
-      }
+    if (!date) {
+      setPickerStep(PICKER_STEP.CLOSED);
+      return;
     }
+
+    if (isIOS) {
+      onChange(date);
+      return;
+    }
+
+    setTempDate(date);
+    setPickerStep(PICKER_STEP.TIME);
   };
 
   const handleTimeChange = (_event: DateTimePickerEvent, date?: Date) => {
-    if (Platform.OS === 'android') setShowTimePicker(false);
-    if (date) {
-      onChange(date);
-    }
+    setPickerStep(PICKER_STEP.CLOSED);
+    if (date) onChange(date);
   };
 
-  if (Platform.OS === 'ios') {
+  if (isIOS) {
     return (
       <View style={styles.container}>
         <DateTimePickerNative
@@ -54,13 +64,13 @@ export function DateTimePicker({ value, onChange, minimumDate }: DateTimePickerP
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.pickerButton} onPress={() => setShowDatePicker(true)}>
+      <Pressable style={styles.pickerButton} onPress={() => setPickerStep(PICKER_STEP.DATE)}>
         <Text style={styles.pickerButtonText}>
           {value ? format(value, 'dd/MM/yyyy HH:mm') : messages.selectDatetime}
         </Text>
       </Pressable>
 
-      {showDatePicker && (
+      {pickerStep === PICKER_STEP.DATE && (
         <DateTimePickerNative
           value={tempDate}
           mode="date"
@@ -70,7 +80,7 @@ export function DateTimePicker({ value, onChange, minimumDate }: DateTimePickerP
         />
       )}
 
-      {showTimePicker && (
+      {pickerStep === PICKER_STEP.TIME && (
         <DateTimePickerNative
           value={tempDate}
           mode="time"

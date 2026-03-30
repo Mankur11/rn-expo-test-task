@@ -3,6 +3,7 @@ export const messages = {
   errorLoadingServices: 'Failed to load services',
   deliveryAddress: 'Delivery address',
   addressPlaceholder: 'Enter your address',
+  addressRequired: 'Address cannot be empty',
   chooseDatetime: 'Choose a date and time',
   selectDatetime: 'Select date and time',
   invalidAppointmentTitle: 'Invalid time',
