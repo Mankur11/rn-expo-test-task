@@ -19,18 +19,15 @@ export function ServiceSelectionScreen() {
   const addPrestation = useBookingStore((s) => s.addPrestation);
   const removePrestation = useBookingStore((s) => s.removePrestation);
   const getQuantity = useBookingStore((s) => s.getQuantity);
-  const totalPrice = useBookingStore((s) => s.totalPrice);
-  const totalDuration = useBookingStore((s) => s.totalDuration);
-  const canProceed = useBookingStore((s) => s.canProceedToAddress);
 
-  const price = totalPrice();
-  const duration = totalDuration();
-  const canNext = canProceed();
+  const price = basket.reduce((sum, p) => sum + p.price, 0);
+  const duration = basket.reduce((sum, p) => sum + p.duration, 0);
+  const canNext = basket.length > 0;
 
   if (isLoading) {
     return (
       <ScreenLayout style={styles.centered}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <ActivityIndicator testID="loading-indicator" size="large" color={theme.colors.primary} />
       </ScreenLayout>
     );
   }

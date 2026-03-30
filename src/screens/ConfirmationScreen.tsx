@@ -23,8 +23,6 @@ export function ConfirmationScreen() {
   const basket = useBookingStore((s) => s.basket);
   const address = useBookingStore((s) => s.address);
   const appointment = useBookingStore((s) => s.appointment);
-  const totalPrice = useBookingStore((s) => s.totalPrice);
-  const totalDuration = useBookingStore((s) => s.totalDuration);
   const reset = useBookingStore((s) => s.reset);
 
   const groupedItems = useMemo(() => groupBasketItems(basket), [basket]);
@@ -32,8 +30,8 @@ export function ConfirmationScreen() {
     () => (appointment ? format(new Date(appointment), 'dd/MM/yyyy HH:mm') : ''),
     [appointment],
   );
-  const formattedDuration = formatDuration(totalDuration());
-  const formattedPrice = formatPrice(totalPrice());
+  const formattedDuration = formatDuration(basket.reduce((sum, p) => sum + p.duration, 0));
+  const formattedPrice = formatPrice(basket.reduce((sum, p) => sum + p.price, 0));
 
   const handleNewBooking = () => {
     reset();

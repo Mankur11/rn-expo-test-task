@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -15,13 +15,10 @@ export function AddressSelectionScreen() {
   const basket = useBookingStore((s) => s.basket);
   const address = useBookingStore((s) => s.address);
   const setAddress = useBookingStore((s) => s.setAddress);
-  const totalPrice = useBookingStore((s) => s.totalPrice);
-  const totalDuration = useBookingStore((s) => s.totalDuration);
-  const canProceed = useBookingStore((s) => s.canProceedToAppointment);
 
-  const price = totalPrice();
-  const duration = totalDuration();
-  const canNext = canProceed();
+  const price = basket.reduce((sum, p) => sum + p.price, 0);
+  const duration = basket.reduce((sum, p) => sum + p.duration, 0);
+  const canNext = basket.length > 0 && address.trim().length > 0;
   const trimmed = address.trim();
   const showError = address.length > 0 && trimmed.length === 0;
 

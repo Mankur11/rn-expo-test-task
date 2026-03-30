@@ -20,8 +20,6 @@ export function AppointmentSelectionScreen() {
   const address = useBookingStore((s) => s.address);
   const appointment = useBookingStore((s) => s.appointment);
   const setAppointment = useBookingStore((s) => s.setAppointment);
-  const totalPrice = useBookingStore((s) => s.totalPrice);
-  const totalDuration = useBookingStore((s) => s.totalDuration);
 
   useEffect(() => {
     if (!appointment) {
@@ -31,8 +29,8 @@ export function AppointmentSelectionScreen() {
 
   const appointmentDate = appointment ? new Date(appointment) : null;
   const appointmentValid = appointmentDate ? isValidAppointment(appointmentDate) : false;
-  const price = totalPrice();
-  const duration = totalDuration();
+  const price = basket.reduce((sum, p) => sum + p.price, 0);
+  const duration = basket.reduce((sum, p) => sum + p.duration, 0);
   const canSubmit = basket.length > 0 && address.trim().length > 0 && appointmentValid;
   const minDate = getMinDate();
 
