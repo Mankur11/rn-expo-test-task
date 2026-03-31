@@ -86,3 +86,4 @@ npm test
 - Add address validation via a geocoding API instead of free-text input
 - Persist basket to AsyncStorage using Zustand's `persist` middleware so it survives app kills
 - Add E2E tests with Detox or Maestro covering the full booking flow
+- Use app-level locale setting (with device locale fallback) for date/currency formatting in `formatters.ts`
