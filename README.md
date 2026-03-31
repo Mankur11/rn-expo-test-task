@@ -79,3 +79,10 @@ npm test
 - Valid booking window: 7:00-22:00 local time, today or future dates
 - Slots snap to 30-minute intervals
 - Default appointment: next available 30-min slot, or tomorrow at 7:00 if past hours
+
+## Nice to Do Later
+
+- Replace `messages.ts` with proper i18n (e.g., `react-i18next`) for real locale support
+- Add address validation via a geocoding API instead of free-text input
+- Persist basket to AsyncStorage using Zustand's `persist` middleware so it survives app kills
+- Add E2E tests with Detox or Maestro covering the full booking flow

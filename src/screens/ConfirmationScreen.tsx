@@ -1,8 +1,6 @@
-import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { format } from 'date-fns';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useBookingStore } from '../store';
 import { useBookingSummary } from '../hooks';
@@ -12,7 +10,7 @@ import {
   ServiceLineItem,
   BookingDetailRow,
 } from '../components';
-import { formatPrice, formatDuration } from '../utils';
+import { formatPrice, formatDuration, formatAppointment } from '../utils';
 import { theme } from '../theme';
 import { messages } from '../constants/messages';
 
@@ -27,10 +25,7 @@ export function ConfirmationScreen() {
 
   const { basketEntries, totalPrice, totalDuration } = useBookingSummary();
 
-  const formattedAppointment = useMemo(
-    () => (appointment ? format(new Date(appointment), 'dd/MM/yyyy HH:mm') : ''),
-    [appointment],
-  );
+  const formattedAppointment = appointment ? formatAppointment(appointment) : '';
   const formattedDuration = formatDuration(totalDuration);
   const formattedPrice = formatPrice(totalPrice);
 

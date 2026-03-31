@@ -1,7 +1,5 @@
 import { isBefore, setHours, setMinutes, setSeconds, startOfDay } from 'date-fns';
-
-const BOOKING_START_HOUR = 7;
-const BOOKING_END_HOUR = 22;
+import { BOOKING_START_HOUR, BOOKING_END_HOUR } from '../constants/business';
 
 export function isValidAppointment(date: Date): boolean {
   const now = new Date();
