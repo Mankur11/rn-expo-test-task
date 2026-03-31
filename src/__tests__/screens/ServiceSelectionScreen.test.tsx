@@ -61,7 +61,7 @@ describe('ServiceSelectionScreen', () => {
     } as ReturnType<typeof useUniverse>);
 
     const { getByText } = renderWithProviders(<ServiceSelectionScreen />);
-    expect(getByText('Failed to load services')).toBeTruthy();
+    expect(getByText('Failed to create booking. Please try again.')).toBeTruthy();
   });
 
   it('renders categories and prestations', () => {
@@ -88,8 +88,10 @@ describe('ServiceSelectionScreen', () => {
     const addButtons = getAllByText('+');
     fireEvent.press(addButtons[0]);
 
-    expect(useBookingStore.getState().basket).toHaveLength(1);
-    expect(useBookingStore.getState().basket[0].reference).toBe('cut-1');
+    const items = useBookingStore.getState().basketItems;
+    expect(Object.keys(items)).toHaveLength(1);
+    expect(items['cut-1'].prestation.reference).toBe('cut-1');
+    expect(items['cut-1'].quantity).toBe(1);
   });
 
   it('navigates to AddressSelection when Next is pressed with items', () => {

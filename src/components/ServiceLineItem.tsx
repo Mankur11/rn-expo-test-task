@@ -2,10 +2,10 @@ import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { formatPrice } from '../utils';
 import { theme } from '../theme';
-import type { GroupedItem } from '../utils/basket';
+import type { BasketItem } from '../store';
 
 interface ServiceLineItemProps {
-  item: GroupedItem;
+  item: BasketItem;
 }
 
 export const ServiceLineItem = memo(function ServiceLineItem({

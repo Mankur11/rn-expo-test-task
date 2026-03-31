@@ -5,9 +5,10 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useUniverse } from '../api';
 import type { Prestation } from '../api';
 import { useBookingStore } from '../store';
+import { useBookingSummary } from '../hooks';
 import { ScreenLayout, ServiceCard, BasketSummary } from '../components';
+import { getErrorMessage } from '../utils';
 import { theme } from '../theme';
-import { messages } from '../constants/messages';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ServiceSelection'>;
 
@@ -15,14 +16,11 @@ export function ServiceSelectionScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { data: universe, isLoading, error } = useUniverse();
 
-  const basket = useBookingStore((s) => s.basket);
   const addPrestation = useBookingStore((s) => s.addPrestation);
   const removePrestation = useBookingStore((s) => s.removePrestation);
   const getQuantity = useBookingStore((s) => s.getQuantity);
 
-  const price = basket.reduce((sum, p) => sum + p.price, 0);
-  const duration = basket.reduce((sum, p) => sum + p.duration, 0);
-  const canNext = basket.length > 0;
+  const { totalPrice, totalDuration, canProceedToAddress } = useBookingSummary();
 
   if (isLoading) {
     return (
@@ -35,7 +33,7 @@ export function ServiceSelectionScreen() {
   if (error || !universe) {
     return (
       <ScreenLayout style={styles.centered}>
-        <Text style={styles.errorText}>{messages.errorLoadingServices}</Text>
+        <Text style={styles.errorText}>{getErrorMessage(error)}</Text>
       </ScreenLayout>
     );
   }
@@ -62,9 +60,9 @@ export function ServiceSelectionScreen() {
     <ScreenLayout
       footer={
         <BasketSummary
-          totalPrice={price}
-          totalDuration={duration}
-          canProceed={canNext}
+          totalPrice={totalPrice}
+          totalDuration={totalDuration}
+          canProceed={canProceedToAddress}
           onNext={() => navigation.navigate('AddressSelection')}
         />
       }

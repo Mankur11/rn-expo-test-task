@@ -14,8 +14,8 @@ describe('booking-store', () => {
   });
 
   describe('initial state', () => {
-    it('starts with empty basket', () => {
-      expect(useBookingStore.getState().basket).toEqual([]);
+    it('starts with empty basketItems', () => {
+      expect(useBookingStore.getState().basketItems).toEqual({});
     });
 
     it('starts with empty address', () => {
@@ -28,35 +28,44 @@ describe('booking-store', () => {
   });
 
   describe('addPrestation', () => {
-    it('adds a prestation to the basket', () => {
+    it('adds a prestation to the basket with quantity 1', () => {
       const p = mockPrestation('a');
       useBookingStore.getState().addPrestation(p);
-      expect(useBookingStore.getState().basket).toHaveLength(1);
-      expect(useBookingStore.getState().basket[0].reference).toBe('a');
+      const items = useBookingStore.getState().basketItems;
+      expect(Object.keys(items)).toHaveLength(1);
+      expect(items['a'].prestation.reference).toBe('a');
+      expect(items['a'].quantity).toBe(1);
     });
 
-    it('allows duplicate prestations', () => {
+    it('increments quantity for duplicate prestations', () => {
       const p = mockPrestation('a');
       useBookingStore.getState().addPrestation(p);
       useBookingStore.getState().addPrestation(p);
-      expect(useBookingStore.getState().basket).toHaveLength(2);
+      expect(useBookingStore.getState().basketItems['a'].quantity).toBe(2);
     });
   });
 
   describe('removePrestation', () => {
-    it('removes one instance of a prestation', () => {
+    it('decrements quantity of a prestation', () => {
       const p = mockPrestation('a');
       useBookingStore.getState().addPrestation(p);
       useBookingStore.getState().addPrestation(p);
       useBookingStore.getState().removePrestation('a');
-      expect(useBookingStore.getState().basket).toHaveLength(1);
+      expect(useBookingStore.getState().basketItems['a'].quantity).toBe(1);
+    });
+
+    it('removes entry when quantity reaches zero', () => {
+      const p = mockPrestation('a');
+      useBookingStore.getState().addPrestation(p);
+      useBookingStore.getState().removePrestation('a');
+      expect(useBookingStore.getState().basketItems['a']).toBeUndefined();
     });
 
     it('does nothing if reference not found', () => {
       const p = mockPrestation('a');
       useBookingStore.getState().addPrestation(p);
       useBookingStore.getState().removePrestation('z');
-      expect(useBookingStore.getState().basket).toHaveLength(1);
+      expect(Object.keys(useBookingStore.getState().basketItems)).toHaveLength(1);
     });
   });
 
@@ -76,16 +85,18 @@ describe('booking-store', () => {
   });
 
   describe('derived selectors', () => {
-    it('totalPrice sums basket prices', () => {
+    it('totalPrice sums basket prices with quantity', () => {
+      useBookingStore.getState().addPrestation(mockPrestation('a', 2000));
       useBookingStore.getState().addPrestation(mockPrestation('a', 2000));
       useBookingStore.getState().addPrestation(mockPrestation('b', 3000));
-      expect(useBookingStore.getState().totalPrice()).toBe(5000);
+      expect(useBookingStore.getState().totalPrice()).toBe(7000);
     });
 
-    it('totalDuration sums basket durations', () => {
+    it('totalDuration sums basket durations with quantity', () => {
+      useBookingStore.getState().addPrestation(mockPrestation('a', 1000, 30));
       useBookingStore.getState().addPrestation(mockPrestation('a', 1000, 30));
       useBookingStore.getState().addPrestation(mockPrestation('b', 1000, 60));
-      expect(useBookingStore.getState().totalDuration()).toBe(90);
+      expect(useBookingStore.getState().totalDuration()).toBe(120);
     });
 
     it('basketNotEmpty returns false for empty basket', () => {
@@ -97,13 +108,33 @@ describe('booking-store', () => {
       expect(useBookingStore.getState().basketNotEmpty()).toBe(true);
     });
 
-    it('getQuantity counts instances of a reference', () => {
+    it('getQuantity returns quantity for a reference', () => {
       useBookingStore.getState().addPrestation(mockPrestation('a'));
       useBookingStore.getState().addPrestation(mockPrestation('a'));
       useBookingStore.getState().addPrestation(mockPrestation('b'));
       expect(useBookingStore.getState().getQuantity('a')).toBe(2);
       expect(useBookingStore.getState().getQuantity('b')).toBe(1);
       expect(useBookingStore.getState().getQuantity('z')).toBe(0);
+    });
+
+    it('getBasketEntries returns array of BasketItems', () => {
+      useBookingStore.getState().addPrestation(mockPrestation('a'));
+      useBookingStore.getState().addPrestation(mockPrestation('a'));
+      useBookingStore.getState().addPrestation(mockPrestation('b'));
+      const entries = useBookingStore.getState().getBasketEntries();
+      expect(entries).toHaveLength(2);
+      expect(entries.find((e) => e.prestation.reference === 'a')?.quantity).toBe(2);
+      expect(entries.find((e) => e.prestation.reference === 'b')?.quantity).toBe(1);
+    });
+
+    it('getPrestationReferences returns flat array with duplicates for quantity', () => {
+      useBookingStore.getState().addPrestation(mockPrestation('a'));
+      useBookingStore.getState().addPrestation(mockPrestation('a'));
+      useBookingStore.getState().addPrestation(mockPrestation('b'));
+      const refs = useBookingStore.getState().getPrestationReferences();
+      expect(refs).toHaveLength(3);
+      expect(refs.filter((r) => r === 'a')).toHaveLength(2);
+      expect(refs.filter((r) => r === 'b')).toHaveLength(1);
     });
   });
 
@@ -146,7 +177,7 @@ describe('booking-store', () => {
       useBookingStore.getState().reset();
 
       const state = useBookingStore.getState();
-      expect(state.basket).toEqual([]);
+      expect(state.basketItems).toEqual({});
       expect(state.address).toBe('');
       expect(state.appointment).toBeNull();
     });

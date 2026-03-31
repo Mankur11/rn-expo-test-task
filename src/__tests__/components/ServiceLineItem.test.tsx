@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import { ServiceLineItem } from '../../components/ServiceLineItem';
-import type { GroupedItem } from '../../utils/basket';
+import type { BasketItem } from '../../store';
 
 describe('ServiceLineItem', () => {
   it('renders title and price for quantity 1', () => {
-    const item: GroupedItem = {
+    const item: BasketItem = {
       prestation: { reference: 'a', title: 'Haircut', price: 2990, duration: 30 },
       quantity: 1,
     };
@@ -15,7 +15,7 @@ describe('ServiceLineItem', () => {
   });
 
   it('renders title with quantity suffix for quantity > 1', () => {
-    const item: GroupedItem = {
+    const item: BasketItem = {
       prestation: { reference: 'a', title: 'Haircut', price: 2990, duration: 30 },
       quantity: 3,
     };

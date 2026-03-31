@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePickerNative, {
   DateTimePickerEvent,
@@ -27,6 +27,11 @@ export function DateTimePicker({ value, onChange, minimumDate }: DateTimePickerP
   const pickerValue = useMemo(() => value ?? new Date(), [value]);
   const [pickerStep, setPickerStep] = useState<PickerStep>(PICKER_STEP.CLOSED);
   const [tempDate, setTempDate] = useState<Date>(pickerValue);
+
+  useEffect(() => {
+    setTempDate(pickerValue);
+  }, [pickerValue]);
+
   const buttonLabel = useMemo(
     () => (value ? format(value, 'dd/MM/yyyy HH:mm') : messages.selectDatetime),
     [value],

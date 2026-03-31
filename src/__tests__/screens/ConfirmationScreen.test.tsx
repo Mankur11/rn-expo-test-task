@@ -68,7 +68,7 @@ describe('ConfirmationScreen', () => {
     const { getByText } = renderWithProviders(<ConfirmationScreen />);
     fireEvent.press(getByText('New Booking'));
 
-    expect(useBookingStore.getState().basket).toEqual([]);
+    expect(useBookingStore.getState().basketItems).toEqual({});
     expect(useBookingStore.getState().address).toBe('');
     expect(useBookingStore.getState().appointment).toBeNull();
     expect(mockDispatch).toHaveBeenCalled();

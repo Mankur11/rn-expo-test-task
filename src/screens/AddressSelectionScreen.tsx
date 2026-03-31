@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useBookingStore } from '../store';
+import { useBookingSummary } from '../hooks';
 import { ScreenLayout, BasketSummary } from '../components';
 import { theme } from '../theme';
 import { messages } from '../constants/messages';
@@ -12,13 +13,11 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'AddressSele
 export function AddressSelectionScreen() {
   const navigation = useNavigation<NavigationProp>();
 
-  const basket = useBookingStore((s) => s.basket);
   const address = useBookingStore((s) => s.address);
   const setAddress = useBookingStore((s) => s.setAddress);
 
-  const price = basket.reduce((sum, p) => sum + p.price, 0);
-  const duration = basket.reduce((sum, p) => sum + p.duration, 0);
-  const canNext = basket.length > 0 && address.trim().length > 0;
+  const { totalPrice, totalDuration, canProceedToAppointment } = useBookingSummary();
+
   const trimmed = address.trim();
   const showError = address.length > 0 && trimmed.length === 0;
 
@@ -26,9 +25,9 @@ export function AddressSelectionScreen() {
     <ScreenLayout
       footer={
         <BasketSummary
-          totalPrice={price}
-          totalDuration={duration}
-          canProceed={canNext}
+          totalPrice={totalPrice}
+          totalDuration={totalDuration}
+          canProceed={canProceedToAppointment}
           onNext={() => navigation.navigate('AppointmentSelection')}
         />
       }
@@ -49,7 +48,7 @@ export function AddressSelectionScreen() {
             autoFocus
             returnKeyType="done"
             onSubmitEditing={() => {
-              if (canNext) navigation.navigate('AppointmentSelection');
+              if (canProceedToAppointment) navigation.navigate('AppointmentSelection');
             }}
           />
           {showError && (

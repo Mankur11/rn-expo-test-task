@@ -4,9 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useBookingStore } from '../store';
+import { useBookingSummary } from '../hooks';
 import { useCreateBooking } from '../api';
 import { ScreenLayout, BasketSummary, DateTimePicker } from '../components';
-import { isValidAppointment, getMinDate, getDefaultAppointment } from '../utils';
+import { isValidAppointment, getMinDate, getDefaultAppointment, getErrorMessage } from '../utils';
 import { theme } from '../theme';
 import { messages } from '../constants/messages';
 
@@ -16,10 +17,11 @@ export function AppointmentSelectionScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { mutate: submitBooking, isPending } = useCreateBooking();
 
-  const basket = useBookingStore((s) => s.basket);
   const address = useBookingStore((s) => s.address);
   const appointment = useBookingStore((s) => s.appointment);
   const setAppointment = useBookingStore((s) => s.setAppointment);
+
+  const { totalPrice, totalDuration, canConfirm } = useBookingSummary();
 
   useEffect(() => {
     if (!appointment) {
@@ -29,9 +31,7 @@ export function AppointmentSelectionScreen() {
 
   const appointmentDate = appointment ? new Date(appointment) : null;
   const appointmentValid = appointmentDate ? isValidAppointment(appointmentDate) : false;
-  const price = basket.reduce((sum, p) => sum + p.price, 0);
-  const duration = basket.reduce((sum, p) => sum + p.duration, 0);
-  const canSubmit = basket.length > 0 && address.trim().length > 0 && appointmentValid;
+  const canSubmit = canConfirm && appointmentValid;
   const minDate = getMinDate();
 
   const handleDateChange = (date: Date) => {
@@ -46,15 +46,14 @@ export function AppointmentSelectionScreen() {
       return;
     }
 
+    const prestations = useBookingStore.getState().getPrestationReferences();
+
     submitBooking(
-      {
-        prestations: basket.map((p) => p.reference),
-        appointment,
-        address,
-      },
+      { prestations, appointment, address },
       {
         onSuccess: () => navigation.navigate('Confirmation'),
-        onError: () => Alert.alert(messages.bookingErrorTitle, messages.bookingError),
+        onError: (error) =>
+          Alert.alert(messages.bookingErrorTitle, getErrorMessage(error)),
       },
     );
   };
@@ -63,8 +62,8 @@ export function AppointmentSelectionScreen() {
     <ScreenLayout
       footer={
         <BasketSummary
-          totalPrice={price}
-          totalDuration={duration}
+          totalPrice={totalPrice}
+          totalDuration={totalDuration}
           canProceed={canSubmit && !isPending}
           onNext={handleConfirm}
           buttonLabel={isPending ? messages.booking : messages.confirm}

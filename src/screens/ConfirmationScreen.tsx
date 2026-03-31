@@ -5,13 +5,14 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format } from 'date-fns';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useBookingStore } from '../store';
+import { useBookingSummary } from '../hooks';
 import {
   ScreenLayout,
   ConfirmationHeader,
   ServiceLineItem,
   BookingDetailRow,
 } from '../components';
-import { formatPrice, formatDuration, groupBasketItems } from '../utils';
+import { formatPrice, formatDuration } from '../utils';
 import { theme } from '../theme';
 import { messages } from '../constants/messages';
 
@@ -20,18 +21,18 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Confirmatio
 export function ConfirmationScreen() {
   const navigation = useNavigation<NavigationProp>();
 
-  const basket = useBookingStore((s) => s.basket);
   const address = useBookingStore((s) => s.address);
   const appointment = useBookingStore((s) => s.appointment);
   const reset = useBookingStore((s) => s.reset);
 
-  const groupedItems = useMemo(() => groupBasketItems(basket), [basket]);
+  const { basketEntries, totalPrice, totalDuration } = useBookingSummary();
+
   const formattedAppointment = useMemo(
     () => (appointment ? format(new Date(appointment), 'dd/MM/yyyy HH:mm') : ''),
     [appointment],
   );
-  const formattedDuration = formatDuration(basket.reduce((sum, p) => sum + p.duration, 0));
-  const formattedPrice = formatPrice(basket.reduce((sum, p) => sum + p.price, 0));
+  const formattedDuration = formatDuration(totalDuration);
+  const formattedPrice = formatPrice(totalPrice);
 
   const handleNewBooking = () => {
     reset();
@@ -47,7 +48,7 @@ export function ConfirmationScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{messages.summaryServices}</Text>
-          {groupedItems.map((item) => (
+          {basketEntries.map((item) => (
             <ServiceLineItem key={item.prestation.reference} item={item} />
           ))}
         </View>
