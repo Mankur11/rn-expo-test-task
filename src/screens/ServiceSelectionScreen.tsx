@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { ActivityIndicator, SectionList, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -22,6 +23,15 @@ export function ServiceSelectionScreen() {
 
   const { totalPrice, totalDuration, canProceedToAddress } = useBookingSummary();
 
+  const sections = useMemo(
+    () =>
+      universe?.categories.map((category) => ({
+        title: category.title,
+        data: category.prestations,
+      })) ?? [],
+    [universe],
+  );
+
   if (isLoading) {
     return (
       <ScreenLayout style={styles.centered}>
@@ -37,11 +47,6 @@ export function ServiceSelectionScreen() {
       </ScreenLayout>
     );
   }
-
-  const sections = universe.categories.map((category) => ({
-    title: category.title,
-    data: category.prestations,
-  }));
 
   const renderItem = ({ item }: { item: Prestation }) => (
     <ServiceCard

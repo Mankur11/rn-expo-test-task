@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   checkmark: {
-    fontSize: 48,
+    fontSize: theme.fontSize.xxl,
     color: theme.colors.success,
     marginBottom: theme.spacing.sm,
   },
