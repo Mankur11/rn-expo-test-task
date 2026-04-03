@@ -61,7 +61,7 @@ describe('ServiceSelectionScreen', () => {
     } as ReturnType<typeof useUniverse>);
 
     const { getByText } = renderWithProviders(<ServiceSelectionScreen />);
-    expect(getByText('Failed to create booking. Please try again.')).toBeTruthy();
+    expect(getByText('Failed to load services')).toBeTruthy();
   });
 
   it('renders categories and prestations', () => {

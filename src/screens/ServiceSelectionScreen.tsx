@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ActivityIndicator, SectionList, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -43,22 +43,38 @@ export function ServiceSelectionScreen() {
   if (error || !universe) {
     return (
       <ScreenLayout style={styles.centered}>
-        <Text style={styles.errorText}>{getErrorMessage(error)}</Text>
+        <Text style={styles.errorText}>{getErrorMessage(error, 'SERVICES_LOAD_FAILED')}</Text>
       </ScreenLayout>
     );
   }
 
-  const renderItem = ({ item }: { item: Prestation }) => (
-    <ServiceCard
-      service={item}
-      quantity={getQuantity(item.reference)}
-      onAdd={() => addPrestation(item)}
-      onRemove={() => removePrestation(item.reference)}
-    />
+  const handleAdd = useCallback(
+    (item: Prestation) => addPrestation(item),
+    [addPrestation],
   );
 
-  const renderSectionHeader = ({ section }: { section: { title: string } }) => (
-    <Text style={styles.sectionHeader}>{section.title}</Text>
+  const handleRemove = useCallback(
+    (reference: string) => removePrestation(reference),
+    [removePrestation],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: Prestation }) => (
+      <ServiceCard
+        service={item}
+        quantity={getQuantity(item.reference)}
+        onAdd={() => handleAdd(item)}
+        onRemove={() => handleRemove(item.reference)}
+      />
+    ),
+    [getQuantity, handleAdd, handleRemove],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: { title: string } }) => (
+      <Text style={styles.sectionHeader}>{section.title}</Text>
+    ),
+    [],
   );
 
   return (

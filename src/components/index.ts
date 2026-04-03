@@ -1,3 +1,4 @@
+export { ErrorBoundary } from './ErrorBoundary';
 export { ScreenLayout } from './ScreenLayout';
 export { ServiceCard } from './ServiceCard';
 export { BasketSummary } from './BasketSummary';

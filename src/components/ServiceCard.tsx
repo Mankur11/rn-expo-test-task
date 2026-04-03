@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Prestation } from '../api/universe';
 import { formatPrice, formatDuration } from '../utils';
@@ -12,7 +13,7 @@ interface ServiceCardProps {
   onRemove: () => void;
 }
 
-export function ServiceCard({ service, quantity, onAdd, onRemove }: ServiceCardProps) {
+export const ServiceCard = memo(function ServiceCard({ service, quantity, onAdd, onRemove }: ServiceCardProps) {
   const formattedPrice = formatPrice(service.price);
   const formattedDuration = formatDuration(service.duration);
 
@@ -39,7 +40,7 @@ export function ServiceCard({ service, quantity, onAdd, onRemove }: ServiceCardP
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

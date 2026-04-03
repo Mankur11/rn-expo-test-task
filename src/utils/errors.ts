@@ -24,7 +24,7 @@ export class AppError extends Error {
   }
 }
 
-export function toAppError(error: unknown): AppError {
+export function toAppError(error: unknown, fallbackCode: AppErrorCode = 'BOOKING_FAILED'): AppError {
   if (error instanceof AppError) return error;
 
   if (error instanceof Error) {
@@ -33,9 +33,9 @@ export function toAppError(error: unknown): AppError {
     }
   }
 
-  return new AppError('BOOKING_FAILED', undefined, error);
+  return new AppError(fallbackCode, undefined, error);
 }
 
-export function getErrorMessage(error: unknown): string {
-  return toAppError(error).message;
+export function getErrorMessage(error: unknown, fallbackCode?: AppErrorCode): string {
+  return toAppError(error, fallbackCode).message;
 }
