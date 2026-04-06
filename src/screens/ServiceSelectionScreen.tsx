@@ -32,22 +32,6 @@ export function ServiceSelectionScreen() {
     [universe],
   );
 
-  if (isLoading) {
-    return (
-      <ScreenLayout style={styles.centered}>
-        <ActivityIndicator testID="loading-indicator" size="large" color={theme.colors.primary} />
-      </ScreenLayout>
-    );
-  }
-
-  if (error || !universe) {
-    return (
-      <ScreenLayout style={styles.centered}>
-        <Text style={styles.errorText}>{getErrorMessage(error, 'SERVICES_LOAD_FAILED')}</Text>
-      </ScreenLayout>
-    );
-  }
-
   const handleAdd = useCallback(
     (item: Prestation) => addPrestation(item),
     [addPrestation],
@@ -76,6 +60,22 @@ export function ServiceSelectionScreen() {
     ),
     [],
   );
+
+  if (isLoading) {
+    return (
+      <ScreenLayout style={styles.centered}>
+        <ActivityIndicator testID="loading-indicator" size="large" color={theme.colors.primary} />
+      </ScreenLayout>
+    );
+  }
+
+  if (error || !universe) {
+    return (
+      <ScreenLayout style={styles.centered}>
+        <Text style={styles.errorText}>{getErrorMessage(error, 'SERVICES_LOAD_FAILED')}</Text>
+      </ScreenLayout>
+    );
+  }
 
   return (
     <ScreenLayout
